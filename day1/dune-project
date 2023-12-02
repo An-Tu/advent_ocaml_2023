@@ -5,7 +5,7 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github An-Tu/advent_ocaml_2023))
 
 (authors "An-Tu")
 
@@ -13,6 +13,6 @@
 
 (package
  (name day1)
- (depends ocaml dune))
+ (depends ocaml dune iter))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

@@ -2,11 +2,12 @@
 opam-version: "2.0"
 maintainer: ["An-Tu"]
 authors: ["An-Tu"]
-homepage: "https://github.com/username/reponame"
-bug-reports: "https://github.com/username/reponame/issues"
+homepage: "https://github.com/An-Tu/advent_ocaml_2023"
+bug-reports: "https://github.com/An-Tu/advent_ocaml_2023/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.11"}
+  "iter"
   "odoc" {with-doc}
 ]
 build: [
@@ -23,4 +24,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/username/reponame.git"
+dev-repo: "git+https://github.com/An-Tu/advent_ocaml_2023.git"
