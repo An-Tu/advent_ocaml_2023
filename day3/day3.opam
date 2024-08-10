@@ -6,7 +6,7 @@ homepage: "https://github.com/An-Tu/advent_ocaml_2023"
 bug-reports: "https://github.com/An-Tu/advent_ocaml_2023/issues"
 depends: [
   "ocaml"
-  "dune" {>= "3.14"}
+  "dune" {>= "3.16"}
   "iter"
   "odoc" {with-doc}
 ]
