@@ -1,11 +1,57 @@
-type t = char list ref
+type t = { number : int; range : Range.t }
 
-let make () = ref []
-let append ch t = t := ch :: !t
-let is_empty t = List.length !t = 0
+let is_digit = function '0' .. '9' -> true | _ -> false
+let is_dot = function '.' -> true | _ -> false
+let get_number { number; _ } = number
+let get_range { range; _ } = range
 
-let to_number position t =
-  let number_len = List.length !t in
-  let number = !t |> Iter.of_list |> Iter.rev |> Iter.to_str |> int_of_string in
-  t := [];
-  Engine_elements.make_number number position number_len
+let get_number_with_properties idx char_list =
+  let number_len = List.length char_list in
+  if number_len = 0 then None
+  else
+    let number =
+      char_list |> Iter.of_list |> Iter.rev |> Iter.to_str |> int_of_string
+    in
+    Some { number; range = Range.(idx - number_len - 1 -- idx) }
+
+let append_number_with_properties idx char_list numbers_with_properties =
+  Option.fold ~none:numbers_with_properties
+    ~some:(fun res -> res :: numbers_with_properties)
+    (get_number_with_properties idx char_list)
+
+let parse_line line =
+  let ( _,
+        symbols_adjacent_numbers_positions,
+        numbers_with_properties,
+        acc_for_number ) =
+    String.fold_left
+      (fun ( idx,
+             symbols_adjacent_numbers_positions,
+             numbers_with_properties,
+             acc_for_number ) ch ->
+        match (is_digit ch, is_dot ch) with
+        | false, false ->
+            ( idx + 1,
+              idx :: symbols_adjacent_numbers_positions,
+              append_number_with_properties idx acc_for_number
+                numbers_with_properties,
+              [] )
+        | _, true ->
+            ( idx + 1,
+              symbols_adjacent_numbers_positions,
+              append_number_with_properties idx acc_for_number
+                numbers_with_properties,
+              [] )
+        | true, _ ->
+            ( idx + 1,
+              symbols_adjacent_numbers_positions,
+              numbers_with_properties,
+              ch :: acc_for_number ))
+      (0, [], [], []) line
+  in
+  let numbers_with_properties =
+    append_number_with_properties
+      (String.length line - 1)
+      acc_for_number numbers_with_properties
+  in
+  (symbols_adjacent_numbers_positions, numbers_with_properties)

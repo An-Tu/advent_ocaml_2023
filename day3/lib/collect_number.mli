@@ -1,6 +1,5 @@
 type t
 
-val make : unit -> t
-val append : char -> t -> unit
-val is_empty : t -> bool
-val to_number : int -> t -> Engine_elements.number
+val get_number : t -> int
+val get_range : t -> Range.t
+val parse_line : string -> int list * t list
