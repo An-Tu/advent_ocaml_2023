@@ -1,7 +1,7 @@
 type t = { number : int; range : Range.t }
 
+let is_asterisk = function '*' -> true | _ -> false
 let is_digit = function '0' .. '9' -> true | _ -> false
-let is_dot = function '.' -> true | _ -> false
 let get_number { number; _ } = number
 let get_range { range; _ } = range
 
@@ -20,31 +20,25 @@ let append_number_with_properties idx char_list numbers_with_properties =
     (get_number_with_properties idx char_list)
 
 let parse_line line =
-  let ( _,
-        symbols_adjacent_numbers_positions,
-        numbers_with_properties,
-        acc_for_number ) =
+  let _, asterisk_positions, numbers_with_properties, acc_for_number =
     String.fold_left
-      (fun ( idx,
-             symbols_adjacent_numbers_positions,
-             numbers_with_properties,
-             acc_for_number ) ch ->
-        match (is_digit ch, is_dot ch) with
+      (fun (idx, asterisk_positions, numbers_with_properties, acc_for_number) ch ->
+        match (is_digit ch, is_asterisk ch) with
         | false, false ->
             ( idx + 1,
-              idx :: symbols_adjacent_numbers_positions,
+              asterisk_positions,
               append_number_with_properties idx acc_for_number
                 numbers_with_properties,
               [] )
         | _, true ->
             ( idx + 1,
-              symbols_adjacent_numbers_positions,
+              idx :: asterisk_positions,
               append_number_with_properties idx acc_for_number
                 numbers_with_properties,
               [] )
         | true, _ ->
             ( idx + 1,
-              symbols_adjacent_numbers_positions,
+              asterisk_positions,
               numbers_with_properties,
               ch :: acc_for_number ))
       (0, [], [], []) line
@@ -54,4 +48,4 @@ let parse_line line =
       (String.length line - 1)
       acc_for_number numbers_with_properties
   in
-  (symbols_adjacent_numbers_positions, numbers_with_properties)
+  (asterisk_positions, numbers_with_properties)
