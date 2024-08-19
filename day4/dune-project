@@ -1,0 +1,18 @@
+(lang dune 3.16)
+
+(name day4)
+
+(generate_opam_files true)
+
+(source
+ (github An-Tu/advent_ocaml_2023))
+
+(authors "An-Tu")
+
+(maintainers "An-Tu")
+
+(package
+ (name day4)
+ (depends ocaml dune angstrom))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
