@@ -16,24 +16,44 @@ let () =
   let file = read_file "input.txt" in
   match Angstrom.parse_string ~consume:All Lib.Parser.parse_all file with
   | Ok v ->
-      let sum =
+      let res =
         v
         |> List.fold_left
              (fun acc (el : Lib.Parser.t) ->
+               let res =
+                 ref
+                   (acc
+                   |> IntMap.update el.card_number (function
+                        | None -> Some 1
+                        | Some x -> Some (x + 1)))
+               in
                let winning_numbers_map =
                  el.winning_numbers
                  |> List.map (fun num -> (num, ()))
                  |> IntMap.of_list
                in
-               acc
-               + (el.our_numbers
+               let match_count =
+                 el.our_numbers
                  |> List.fold_left
                       (fun acc num ->
                         match IntMap.mem num winning_numbers_map with
                         | false -> acc
-                        | true -> if acc = 0 then 1 else acc * 2)
-                      0))
-             0
+                        | true -> acc + 1)
+                      0
+               in
+               for i = match_count downto 1 do
+                 res :=
+                   !res
+                   |> IntMap.update (el.card_number + i) (fun value ->
+                          let add_count = !res |> IntMap.find el.card_number in
+                          match value with
+                          | None -> Some add_count
+                          | Some x -> Some (x + add_count))
+               done;
+               !res)
+             IntMap.empty
+        |> IntMap.to_list
+        |> List.fold_left (fun acc (num, count) -> acc + count) 0
       in
-      print_endline ("Result: " ^ (sum |> string_of_int))
+      print_endline ("Result: " ^ (res |> string_of_int))
   | Error msg -> failwith msg
