@@ -55,11 +55,5 @@ let line =
   let open Angstrom in
   let* card_number = card_number in
   let* winning_numbers = many_till number_with_space divider_with_space in
-  let+ our_numbers =
-    many_till (number_with_space <|> one_or_two_digit_number) end_of_line
-  in
+  let+ our_numbers = many1 (number_with_space <|> one_or_two_digit_number) in
   { card_number; winning_numbers; our_numbers }
-
-let parse_all =
-  let open Angstrom in
-  many1 line

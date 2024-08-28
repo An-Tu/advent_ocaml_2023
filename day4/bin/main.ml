@@ -4,8 +4,6 @@ module IntMap = Map.Make (struct
   let compare = compare
 end)
 
-let read_file file = In_channel.with_open_bin file In_channel.input_all
-
 let pp_int_list fmt list =
   let open Format in
   fprintf fmt "[ %a ]"
@@ -13,13 +11,13 @@ let pp_int_list fmt list =
     list
 
 let () =
-  let file = read_file "input.txt" in
-  match Angstrom.parse_string ~consume:All Lib.Parser.parse_all file with
-  | Ok v ->
-      let res =
-        v
-        |> List.fold_left
-             (fun acc (el : Lib.Parser.t) ->
+  let cards_in_total, _ =
+    Iter.IO.lines_of "input.txt"
+    |> Iter.map (Angstrom.parse_string ~consume:All Lib.Parser.line)
+    |> Iter.fold
+         (fun (cards_in_total, acc) parsing_results ->
+           match parsing_results with
+           | Ok (el : Lib.Parser.t) ->
                let res =
                  ref
                    (acc
@@ -41,19 +39,20 @@ let () =
                         | true -> acc + 1)
                       0
                in
+
+               let card_copies_number = !res |> IntMap.find el.card_number in
                for i = match_count downto 1 do
                  res :=
                    !res
                    |> IntMap.update (el.card_number + i) (fun value ->
-                          let add_count = !res |> IntMap.find el.card_number in
                           match value with
-                          | None -> Some add_count
-                          | Some x -> Some (x + add_count))
+                          | None -> Some card_copies_number
+                          | Some x -> Some (x + card_copies_number))
                done;
-               !res)
-             IntMap.empty
-        |> IntMap.to_list
-        |> List.fold_left (fun acc (num, count) -> acc + count) 0
-      in
-      print_endline ("Result: " ^ (res |> string_of_int))
-  | Error msg -> failwith msg
+               ( cards_in_total + card_copies_number,
+                 !res |> IntMap.remove el.card_number )
+           | Error msg -> failwith msg)
+         (0, IntMap.empty)
+  in
+
+  print_endline ("Result: " ^ (cards_in_total |> string_of_int))
